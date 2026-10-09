@@ -40,7 +40,7 @@ export function Overview({ areas, risk, resources, loading, error, onRetry, upda
       }
     >
       <div className="stat-grid">
-        <Pill label="Monitored Areas" value={fmtInt(areaCount)} tag="8 Active" tone="teal" />
+        <Pill label="Monitored Areas" value={fmtInt(areaCount)} tag={`${areaCount} Active`} tone="teal" />
         <Pill label="Total Units Deployed" value={fmtInt(totalCurrent)} tag="Inventory" tone="ok" />
         <Pill label="Total Deficit" value={fmtInt(totalDeficit)} tag={totalDeficit > 0 ? '⚠️ High' : '✓ None'} tone={totalDeficit > 0 ? 'danger' : 'ok'} />
         <Pill label="Total Surplus" value={fmtInt(totalSurplus)} tag="Available" tone="teal" />
@@ -79,9 +79,14 @@ export function Overview({ areas, risk, resources, loading, error, onRetry, upda
       </div>
 
       <div style={{ marginTop: '24px' }}>
-        <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 12px', color: '#0f172a' }}>
-          Resource Balance Breakdown
-        </h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: 0, color: '#0f172a' }}>
+            Resource Balance Breakdown
+          </h3>
+          <span style={{ fontSize: '0.75rem', padding: '2px 8px', borderRadius: '4px', background: '#f1f5f9', color: '#64748b', fontWeight: 600 }}>
+            ℹ️ Demonstration / Baseline Inventory Data
+          </span>
+        </div>
         <div className="table-wrap">
           <table className="table">
             <thead>

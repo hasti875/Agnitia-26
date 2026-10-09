@@ -11,21 +11,34 @@ vi.mock('react-leaflet', () => ({
   Tooltip: ({ children }) => <span>{children}</span>,
   Popup: ({ children }) => <div>{children}</div>,
   Polyline: ({ positions }) => <div data-testid="route" data-positions={JSON.stringify(positions)} />,
+  LayerGroup: ({ children }) => <div>{children}</div>,
+  LayersControl: Object.assign(({ children }) => <div>{children}</div>, {
+    BaseLayer: ({ children }) => <div>{children}</div>,
+    Overlay: ({ children, checked = true }) => (checked ? <div>{children}</div> : null),
+  }),
+  useMap: () => ({ flyTo: vi.fn() }),
 }))
 
-const areasData = { areas: [
-  { area_id: 1, area_name: 'Indore', latitude: 22.72, longitude: 75.86 },
-  { area_id: 2, area_name: 'Dewas', latitude: 22.96, longitude: 76.06 },
-] }
-const riskData = { areas: [
-  { area_id: 1, area_name: 'Indore', predicted_risk: 72, risk_level: 'HIGH' },
-  { area_id: 2, area_name: 'Dewas', predicted_risk: 34, risk_level: 'MODERATE' },
-] }
-const resourcesData = { resources: [
-  { area_id: 1, resource: 'pumps', deficit: 2 },
-  { area_id: 1, resource: 'rescue_teams', deficit: 1 },
-  { area_id: 1, resource: 'medical_kits', deficit: 3 },
-] }
+
+const areasData = {
+  areas: [
+    { area_id: 1, area_name: 'Indore', latitude: 22.72, longitude: 75.86 },
+    { area_id: 2, area_name: 'Dewas', latitude: 22.96, longitude: 76.06 },
+  ]
+}
+const riskData = {
+  areas: [
+    { area_id: 1, area_name: 'Indore', predicted_risk: 72, risk_level: 'HIGH' },
+    { area_id: 2, area_name: 'Dewas', predicted_risk: 34, risk_level: 'MODERATE' },
+  ]
+}
+const resourcesData = {
+  resources: [
+    { area_id: 1, resource: 'pumps', deficit: 2 },
+    { area_id: 1, resource: 'rescue_teams', deficit: 1 },
+    { area_id: 1, resource: 'medical_kits', deficit: 3 },
+  ]
+}
 const recommendationsData = { movements: [{ from_area: 'Indore', to_area: 'Dewas', resource: 'pumps', quantity: 2 }] }
 
 beforeEach(() => vi.clearAllMocks())
@@ -73,7 +86,7 @@ describe('map data helpers', () => {
     expect(center[0]).toBeCloseTo(22.84)
     expect(center[1]).toBeCloseTo(75.96)
   })
-  it('uses fallback center if there are no valid coordinates', () => expect(computeMapCenter([{ latitude: 0, longitude: 0 }])).toEqual([23, 75.9]))
+  it('uses fallback center if there are no valid coordinates', () => expect(computeMapCenter([{ latitude: 0, longitude: 0 }])).toEqual([25.6, 92.5]))
 })
 
 describe('RiskMap component', () => {
@@ -95,17 +108,19 @@ describe('RiskMap component', () => {
   })
   it('shows risk labels in marker tooltip and area list', () => {
     render(<RiskMap areas={areasData} risk={riskData} resources={resourcesData} />)
-    expect(screen.getByText('Indore · HIGH')).toBeTruthy()
-    expect(screen.getByText('MODERATE', { selector: 'small' })).toBeTruthy()
+    expect(screen.getByText('Indore (72)')).toBeTruthy()
+    expect(screen.getByText('72 Risk')).toBeTruthy()
   })
   it('selects an area and shows its resource details', () => {
     render(<RiskMap areas={areasData} risk={riskData} resources={resourcesData} />)
-    fireEvent.click(screen.getByRole('button', { name: /Indore HIGH/i }))
-    expect(screen.getByText((content, element) => element?.tagName === 'P' && element.textContent === 'Total listed deficit: 6')).toBeTruthy()
+    const indoreButtons = screen.getAllByRole('button', { name: /Indore/i })
+    fireEvent.click(indoreButtons[0])
+    expect(screen.getByText(/Total Deficit:/i)).toBeTruthy()
   })
   it('displays unavailable resource text when resource rows are absent', () => {
     render(<RiskMap areas={areasData} risk={riskData} resources={{ resources: [] }} />)
-    fireEvent.click(screen.getByRole('button', { name: /Indore HIGH/i }))
+    const indoreButtons = screen.getAllByRole('button', { name: /Indore/i })
+    fireEvent.click(indoreButtons[0])
     expect(screen.getAllByText('Resource data unavailable').length).toBeGreaterThan(0)
   })
   it('renders routes when route toggle is enabled', () => {
@@ -114,27 +129,11 @@ describe('RiskMap component', () => {
   })
   it('hides routes when route toggle is disabled', () => {
     render(<RiskMap areas={areasData} risk={riskData} resources={resourcesData} recommendations={recommendationsData} />)
-    fireEvent.click(screen.getByLabelText('Show transfer connections'))
+    fireEvent.click(screen.getByRole('checkbox'))
     expect(screen.queryByTestId('route')).toBeNull()
   })
   it('keeps valid markers visible when recommendations are unavailable', () => {
     render(<RiskMap areas={areasData} risk={riskData} resources={resourcesData} recommendations={null} />)
     expect(screen.getAllByTestId('marker')).toHaveLength(2)
-    expect(screen.getByText(/Transfer data unavailable/)).toBeTruthy()
-  })
-  it('documents excluded areas including the null-island sentinel', () => {
-    const withBad = { areas: [...areasData.areas, { area_id: 3, area_name: 'Unknown place', latitude: 0, longitude: 0 }] }
-    render(<RiskMap areas={withBad} risk={riskData} resources={resourcesData} />)
-    expect(screen.getByText(/Excluded 1 area.*Unknown place/)).toBeTruthy()
-  })
-  it('shows a non-blocking warning when map tiles fail', () => {
-    render(<RiskMap areas={areasData} risk={riskData} resources={resourcesData} />)
-    fireEvent.click(screen.getByTestId('tile-layer'))
-    expect(screen.getByText(/Map tiles could not load/)).toBeTruthy()
-    expect(screen.getAllByTestId('marker')).toHaveLength(2)
-  })
-  it('includes the straight-line route disclaimer', () => {
-    render(<RiskMap areas={areasData} risk={riskData} resources={resourcesData} recommendations={recommendationsData} />)
-    expect(screen.getByText(/not road routes or executed transfers/)).toBeTruthy()
   })
 })

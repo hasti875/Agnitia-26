@@ -21,12 +21,12 @@ export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
   })
 
   const headers = [
-    { key: 'area_name', label: 'Area / Ward Name' },
-    { key: 'predicted_risk', label: '6h Predicted Risk' },
+    { key: 'area_name', label: 'Area / Location' },
+    { key: 'predicted_risk', label: '6h Risk Index' },
     { key: 'risk_level', label: 'Category' },
-    { key: 'population', label: 'Population (000s)' },
-    { key: 'population_density', label: 'Density (/km²)' },
-    { key: 'vulnerability_index', label: 'Vulnerability Index' },
+    { key: 'obs_rain', label: 'Observed Rain (24h)' },
+    { key: 'fc_rain', label: 'Forecast Rain (6h)' },
+    { key: 'vulnerability_index', label: 'Vulnerability' },
   ]
 
   function toggleSort(key) {
@@ -37,8 +37,8 @@ export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
   return (
     <Section
       id="area-risk"
-      title="Regional Risk & Demographics"
-      subtitle="6-hour-ahead predicted flood risk per area alongside demographic vulnerability metrics."
+      title="Regional Risk & Weather Telemetry"
+      subtitle="Deterministic rule-based risk scores calculated from Open-Meteo rainfall telemetry and static area vulnerability."
       loading={loading}
       error={error}
       onRetry={onRetry}
@@ -76,21 +76,25 @@ export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
             </tr>
           </thead>
           <tbody>
-            {sorted.map((r) => (
-              <tr key={r.area_id}>
-                <td className="label">
-                  {r.area_name}
-                  <span className="muted" style={{ fontSize: '0.8rem', marginLeft: '6px' }}>({r.area_id})</span>
-                </td>
-                <td className="num" style={{ fontWeight: 800 }}>
-                  {fmtNum(r.predicted_risk, 1)}<span className="muted">/100</span>
-                </td>
-                <td><RiskBadge level={r.risk_level} /></td>
-                <td className="num">{fmtNum(r.population, 0)}</td>
-                <td className="num">{fmtNum(r.population_density, 0)}</td>
-                <td className="num">{fmtNum(r.vulnerability_index, 2)}</td>
-              </tr>
-            ))}
+            {sorted.map((r) => {
+              const obsRain = r.components?.observed_rain_24h_mm ?? r.obs_rain ?? 0.0
+              const fcRain = r.components?.forecast_rain_6h_mm ?? r.fc_rain ?? 0.0
+              return (
+                <tr key={r.area_id}>
+                  <td className="label">
+                    {r.area_name}
+                    <span className="muted" style={{ fontSize: '0.8rem', marginLeft: '6px' }}>({r.area_id})</span>
+                  </td>
+                  <td className="num" style={{ fontWeight: 800 }}>
+                    {fmtNum(r.predicted_risk, 1)}<span className="muted">/100</span>
+                  </td>
+                  <td><RiskBadge level={r.risk_level} /></td>
+                  <td className="num">{fmtNum(obsRain, 1)} mm</td>
+                  <td className="num">{fmtNum(fcRain, 1)} mm</td>
+                  <td className="num">{fmtNum(r.vulnerability_index, 2)}</td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

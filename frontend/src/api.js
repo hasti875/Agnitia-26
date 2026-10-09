@@ -13,85 +13,64 @@ const BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/+$/, '
 
 const MOCK_DATA = {
   areas: {
-    count: 8,
+    count: 7,
     areas: [
-      { area_id: 'A1', area_name: 'Indore', population: 2167.0, population_density: 3900.0, vulnerability_index: 0.72, latitude: 22.7196, longitude: 75.8577, category: 'Residential Central' },
-      { area_id: 'A2', area_name: 'Ujjain', population: 571.0, population_density: 2200.0, vulnerability_index: 0.85, latitude: 23.1765, longitude: 75.7885, category: 'North Zone' },
-      { area_id: 'A3', area_name: 'Dewas', population: 290.0, population_density: 1800.0, vulnerability_index: 0.68, latitude: 22.9676, longitude: 76.0534, category: 'Traffic Hub' },
-      { area_id: 'A4', area_name: 'Dhar', population: 106.0, population_density: 1200.0, vulnerability_index: 0.55, latitude: 22.5975, longitude: 75.3040, category: 'East Sector' },
-      { area_id: 'A5', area_name: 'Ratlam', population: 273.0, population_density: 2100.0, vulnerability_index: 0.42, latitude: 23.3315, longitude: 75.0367, category: 'West Sector' },
-      { area_id: 'A6', area_name: 'Mandsaur', population: 141.0, population_density: 1400.0, vulnerability_index: 0.79, latitude: 24.0724, longitude: 75.0697, category: 'Industrial Area' },
-      { area_id: 'A7', area_name: 'Mhow', population: 85.0, population_density: 1600.0, vulnerability_index: 0.81, latitude: 22.5542, longitude: 75.7562, category: 'South Suburb' },
-      { area_id: 'A8', area_name: 'Khargone', population: 133.0, population_density: 1300.0, vulnerability_index: 0.76, latitude: 21.8253, longitude: 75.6062, category: 'River Corridor' },
+      { area_id: 'GAU', area_name: 'Guwahati (Assam)', population: 1100.0, population_density: 2900.0, vulnerability_index: 0.78, latitude: 26.1433, longitude: 91.7362, category: 'Brahmaputra Basin' },
+      { area_id: 'SHL', area_name: 'Shillong (Meghalaya)', population: 180.0, population_density: 1200.0, vulnerability_index: 0.68, latitude: 25.5788, longitude: 91.8933, category: 'Highland Ridge' },
+      { area_id: 'ITA', area_name: 'Itanagar (Arunachal Pradesh)', population: 60.0, population_density: 400.0, vulnerability_index: 0.62, latitude: 27.0844, longitude: 93.6053, category: 'Hilly Terrain' },
+      { area_id: 'KOH', area_name: 'Kohima (Nagaland)', population: 120.0, population_density: 650.0, vulnerability_index: 0.58, latitude: 25.6751, longitude: 94.1086, category: 'Hill Topography' },
+      { area_id: 'IMP', area_name: 'Imphal (Manipur)', population: 270.0, population_density: 1600.0, vulnerability_index: 0.72, latitude: 24.8170, longitude: 93.9368, category: 'Valley Basin' },
+      { area_id: 'AIZ', area_name: 'Aizawl (Mizoram)', population: 300.0, population_density: 950.0, vulnerability_index: 0.55, latitude: 23.7271, longitude: 92.7176, category: 'Ridge Zone' },
+      { area_id: 'AGT', area_name: 'Agartala (Tripura)', population: 520.0, population_density: 2100.0, vulnerability_index: 0.75, latitude: 23.8315, longitude: 91.2868, category: 'River Valley' },
     ]
   },
-  risk: {
-    count: 8,
-    areas: [
-      { area_id: 'A1', area_name: 'Indore', predicted_risk: 74.5, risk_level: 'HIGH' },
-      { area_id: 'A2', area_name: 'Ujjain', predicted_risk: 88.2, risk_level: 'CRITICAL' },
-      { area_id: 'A3', area_name: 'Dewas', predicted_risk: 65.0, risk_level: 'VERY HIGH' },
-      { area_id: 'A4', area_name: 'Dhar', predicted_risk: 32.4, risk_level: 'MODERATE' },
-      { area_id: 'A5', area_name: 'Ratlam', predicted_risk: 14.8, risk_level: 'LOW' },
-      { area_id: 'A6', area_name: 'Mandsaur', predicted_risk: 82.0, risk_level: 'CRITICAL' },
-      { area_id: 'A7', area_name: 'Mhow', predicted_risk: 79.1, risk_level: 'CRITICAL' },
-      { area_id: 'A8', area_name: 'Khargone', predicted_risk: 52.0, risk_level: 'HIGH' },
-    ],
-    model_provenance: {
-      active_model: 'real_data_model',
-      source_data: 'Live climate sensor network',
-      warning: null
-    }
-  },
+  // NOTE: /risk and /weather have NO mock fallback.
+  // They must surface errors to the UI when the backend is unreachable.
   resources: {
-    count: 24,
+    count: 21,
     resources: [
-      { area_id: 'A1', area_name: 'Indore', resource: 'pumps', current: 6, required: 6, deficit: 0, surplus: 0 },
-      { area_id: 'A1', area_name: 'Indore', resource: 'rescue_teams', current: 4, required: 4, deficit: 0, surplus: 0 },
-      { area_id: 'A1', area_name: 'Indore', resource: 'medical_kits', current: 400, required: 400, deficit: 0, surplus: 0 },
-      { area_id: 'A2', area_name: 'Ujjain', resource: 'pumps', current: 2, required: 5, deficit: 3, surplus: 0 },
-      { area_id: 'A2', area_name: 'Ujjain', resource: 'rescue_teams', current: 1, required: 3, deficit: 2, surplus: 0 },
-      { area_id: 'A2', area_name: 'Ujjain', resource: 'medical_kits', current: 140, required: 200, deficit: 60, surplus: 0 },
-      { area_id: 'A3', area_name: 'Dewas', resource: 'pumps', current: 3, required: 3, deficit: 0, surplus: 0 },
-      { area_id: 'A3', area_name: 'Dewas', resource: 'rescue_teams', current: 1, required: 2, deficit: 1, surplus: 0 },
-      { area_id: 'A3', area_name: 'Dewas', resource: 'medical_kits', current: 160, required: 180, deficit: 20, surplus: 0 },
-      { area_id: 'A4', area_name: 'Dhar', resource: 'pumps', current: 4, required: 2, deficit: 0, surplus: 2 },
-      { area_id: 'A4', area_name: 'Dhar', resource: 'rescue_teams', current: 3, required: 2, deficit: 0, surplus: 1 },
-      { area_id: 'A4', area_name: 'Dhar', resource: 'medical_kits', current: 220, required: 160, deficit: 0, surplus: 60 },
-      { area_id: 'A5', area_name: 'Ratlam', resource: 'pumps', current: 5, required: 3, deficit: 0, surplus: 2 },
-      { area_id: 'A5', area_name: 'Ratlam', resource: 'rescue_teams', current: 3, required: 2, deficit: 0, surplus: 1 },
-      { area_id: 'A5', area_name: 'Ratlam', resource: 'medical_kits', current: 240, required: 180, deficit: 0, surplus: 60 },
-      { area_id: 'A6', area_name: 'Mandsaur', resource: 'pumps', current: 2, required: 3, deficit: 1, surplus: 0 },
-      { area_id: 'A6', area_name: 'Mandsaur', resource: 'rescue_teams', current: 1, required: 2, deficit: 1, surplus: 0 },
-      { area_id: 'A6', area_name: 'Mandsaur', resource: 'medical_kits', current: 100, required: 150, deficit: 50, surplus: 0 },
-      { area_id: 'A7', area_name: 'Mhow', resource: 'pumps', current: 1, required: 3, deficit: 2, surplus: 0 },
-      { area_id: 'A7', area_name: 'Mhow', resource: 'rescue_teams', current: 1, required: 2, deficit: 1, surplus: 0 },
-      { area_id: 'A7', area_name: 'Mhow', resource: 'medical_kits', current: 80, required: 120, deficit: 40, surplus: 0 },
-      { area_id: 'A8', area_name: 'Khargone', resource: 'pumps', current: 2, required: 2, deficit: 0, surplus: 0 },
-      { area_id: 'A8', area_name: 'Khargone', resource: 'rescue_teams', current: 2, required: 2, deficit: 0, surplus: 0 },
-      { area_id: 'A8', area_name: 'Khargone', resource: 'medical_kits', current: 150, required: 150, deficit: 0, surplus: 0 },
+      { area_id: 'GAU', area_name: 'Guwahati (Assam)', resource: 'pumps', current: 15, required: 22, deficit: 7, surplus: 0 },
+      { area_id: 'GAU', area_name: 'Guwahati (Assam)', resource: 'rescue_teams', current: 10, required: 16, deficit: 6, surplus: 0 },
+      { area_id: 'GAU', area_name: 'Guwahati (Assam)', resource: 'medical_kits', current: 70, required: 95, deficit: 25, surplus: 0 },
+      { area_id: 'SHL', area_name: 'Shillong (Meghalaya)', resource: 'pumps', current: 9, required: 14, deficit: 5, surplus: 0 },
+      { area_id: 'SHL', area_name: 'Shillong (Meghalaya)', resource: 'rescue_teams', current: 6, required: 9, deficit: 3, surplus: 0 },
+      { area_id: 'SHL', area_name: 'Shillong (Meghalaya)', resource: 'medical_kits', current: 35, required: 50, deficit: 15, surplus: 0 },
+      { area_id: 'ITA', area_name: 'Itanagar (Arunachal Pradesh)', resource: 'pumps', current: 8, required: 5, deficit: 0, surplus: 3 },
+      { area_id: 'ITA', area_name: 'Itanagar (Arunachal Pradesh)', resource: 'rescue_teams', current: 5, required: 4, deficit: 0, surplus: 1 },
+      { area_id: 'ITA', area_name: 'Itanagar (Arunachal Pradesh)', resource: 'medical_kits', current: 40, required: 25, deficit: 0, surplus: 15 },
+      { area_id: 'KOH', area_name: 'Kohima (Nagaland)', resource: 'pumps', current: 6, required: 11, deficit: 5, surplus: 0 },
+      { area_id: 'KOH', area_name: 'Kohima (Nagaland)', resource: 'rescue_teams', current: 4, required: 7, deficit: 3, surplus: 0 },
+      { area_id: 'KOH', area_name: 'Kohima (Nagaland)', resource: 'medical_kits', current: 25, required: 35, deficit: 10, surplus: 0 },
+      { area_id: 'IMP', area_name: 'Imphal (Manipur)', resource: 'pumps', current: 10, required: 15, deficit: 5, surplus: 0 },
+      { area_id: 'IMP', area_name: 'Imphal (Manipur)', resource: 'rescue_teams', current: 7, required: 10, deficit: 3, surplus: 0 },
+      { area_id: 'IMP', area_name: 'Imphal (Manipur)', resource: 'medical_kits', current: 45, required: 60, deficit: 15, surplus: 0 },
+      { area_id: 'AIZ', area_name: 'Aizawl (Mizoram)', resource: 'pumps', current: 9, required: 6, deficit: 0, surplus: 3 },
+      { area_id: 'AIZ', area_name: 'Aizawl (Mizoram)', resource: 'rescue_teams', current: 6, required: 4, deficit: 0, surplus: 2 },
+      { area_id: 'AIZ', area_name: 'Aizawl (Mizoram)', resource: 'medical_kits', current: 45, required: 30, deficit: 0, surplus: 15 },
+      { area_id: 'AGT', area_name: 'Agartala (Tripura)', resource: 'pumps', current: 12, required: 16, deficit: 4, surplus: 0 },
+      { area_id: 'AGT', area_name: 'Agartala (Tripura)', resource: 'rescue_teams', current: 8, required: 11, deficit: 3, surplus: 0 },
+      { area_id: 'AGT', area_name: 'Agartala (Tripura)', resource: 'medical_kits', current: 55, required: 70, deficit: 15, surplus: 0 },
     ],
     totals: {
-      pumps: { total_current: 25, total_required: 27, total_surplus: 4, total_deficit: 6 },
-      rescue_teams: { total_current: 16, total_required: 18, total_surplus: 2, total_deficit: 4 },
-      medical_kits: { total_current: 1490, total_required: 1540, total_surplus: 120, total_deficit: 170 }
+      pumps: { total_current: 67, total_required: 89, total_surplus: 6, total_deficit: 26 },
+      rescue_teams: { total_current: 46, total_required: 61, total_surplus: 3, total_deficit: 18 },
+      medical_kits: { total_current: 315, total_required: 415, total_surplus: 30, total_deficit: 95 }
     }
   },
   recommendations: {
     feasible: true,
     status: 'OPTIMAL',
-    objective_value: 142.8,
-    total_resources_moved: 13,
-    total_movement_cost: 45.2,
+    objective_value: 184.2,
+    total_resources_moved: 12,
+    total_movement_cost: 68.5,
     remaining_deficit: 0,
-    total_estimated_risk_benefit: 38.6,
+    total_estimated_risk_benefit: 52.4,
     movements: [
-      { from_area: 'Ratlam', to_area: 'Ujjain', resource: 'pumps', quantity: 2, distance_km: 72, movement_cost: 14.4, reason: 'Transferred surplus pumps to critical risk area' },
-      { from_area: 'Dhar', to_area: 'Ujjain', resource: 'pumps', quantity: 1, distance_km: 84, movement_cost: 8.4, reason: 'Supplied high priority deficit zone' },
-      { from_area: 'Dhar', to_area: 'Mhow', resource: 'pumps', quantity: 1, distance_km: 45, movement_cost: 4.5, reason: 'Nearby allocation for rapid response' },
-      { from_area: 'Ratlam', to_area: 'Ujjain', resource: 'rescue_teams', quantity: 1, distance_km: 72, movement_cost: 7.2, reason: 'Rescue team re-deployment' },
-      { from_area: 'Dhar', to_area: 'Mandsaur', resource: 'medical_kits', quantity: 50, distance_km: 160, movement_cost: 8.0, reason: 'Medical kit redistribution' },
-      { from_area: 'Ratlam', to_area: 'Ujjain', resource: 'medical_kits', quantity: 30, distance_km: 72, movement_cost: 2.7, reason: 'Emergency medical supplement' },
+      { from_area: 'Itanagar (Arunachal Pradesh)', to_area: 'Guwahati (Assam)', resource: 'pumps', quantity: 3, distance_km: 320, movement_cost: 28.8, reason: 'Transferred surplus pumps to critical Brahmaputra basin risk zone' },
+      { from_area: 'Aizawl (Mizoram)', to_area: 'Shillong (Meghalaya)', resource: 'pumps', quantity: 3, distance_km: 440, movement_cost: 15.6, reason: 'Supplied high-priority highland cloudburst deficit area' },
+      { from_area: 'Itanagar (Arunachal Pradesh)', to_area: 'Guwahati (Assam)', resource: 'rescue_teams', quantity: 1, distance_km: 320, movement_cost: 9.6, reason: 'Rapid rescue team deployment to severe inundation zone' },
+      { from_area: 'Aizawl (Mizoram)', to_area: 'Imphal (Manipur)', resource: 'rescue_teams', quantity: 2, distance_km: 380, movement_cost: 11.4, reason: 'Inter-state emergency rescue support for valley flooding' },
+      { from_area: 'Itanagar (Arunachal Pradesh)', to_area: 'Guwahati (Assam)', resource: 'medical_kits', quantity: 15, distance_km: 320, movement_cost: 3.1, reason: 'Redistributed medical supply kits to high density urban center' },
     ],
     remaining_deficits: []
   },
@@ -101,44 +80,45 @@ const MOCK_DATA = {
     absolute_reduction: 35.57,
     percentage_reduction: 42.3,
     metric_name: 'Estimated Prototype Risk-Impact Index',
-    improved_areas: ['Ujjain', 'Mhow', 'Mandsaur', 'Dewas'],
+    improved_areas: ['Guwahati (Assam)', 'Shillong (Meghalaya)', 'Imphal (Manipur)', 'Agartala (Tripura)'],
     worsened_areas: [],
-    assumptions: ['Resource movement occurs within a 6-hour window', 'Transportation routes are unblocked'],
+    assumptions: ['Inter-state resource movement occurs within a 12-hour window', 'Highland highway corridors remain accessible'],
     limitations: ['Prototype model estimates; require field verification']
   },
   explanations: {
-    disclaimer: 'This dashboard provides prototype decision support based on automated risk analysis.',
+    disclaimer: 'This dashboard provides prototype decision support based on automated risk analysis across Northeastern India.',
     area_risk: [
-      { area_id: 'A2', area_name: 'Ujjain', risk_level: 'CRITICAL', predicted_risk: 88.2, explanation: 'High river discharge and dense population elevate flood probability to critical levels in the next 6 hours.' },
-      { area_id: 'A6', area_name: 'Mandsaur', risk_level: 'CRITICAL', predicted_risk: 82.0, explanation: 'Persistent rainfall accumulation increases local inundation vulnerability.' },
-      { area_id: 'A1', area_name: 'Indore', risk_level: 'HIGH', predicted_risk: 74.5, explanation: 'Urban drainage capacity strain under heavy precipitation forecast.' },
-      { area_id: 'A5', area_name: 'Ratlam', risk_level: 'LOW', predicted_risk: 14.8, explanation: 'Low precipitation forecast and adequate elevation maintain low risk.' },
+      { area_id: 'GAU', area_name: 'Guwahati (Assam)', risk_level: 'CRITICAL', predicted_risk: 84.2, explanation: 'Brahmaputra river discharge and severe urban waterlogging elevate flood risk in next 6 hours.' },
+      { area_id: 'SHL', area_name: 'Shillong (Meghalaya)', risk_level: 'HIGH', predicted_risk: 72.0, explanation: 'Highland cloudburst accumulation increases flash runoff vulnerability.' },
+      { area_id: 'IMP', area_name: 'Imphal (Manipur)', risk_level: 'HIGH', predicted_risk: 68.5, explanation: 'Imphal valley basin drainage strain under continuous precipitation.' },
+      { area_id: 'ITA', area_name: 'Itanagar (Arunachal Pradesh)', risk_level: 'LOW', predicted_risk: 24.8, explanation: 'Moderate precipitation forecast and adequate slope drainage maintain low risk.' },
     ],
     resource_shortages: {
-      summary: 'Ujjain, Mhow, and Mandsaur require immediate resource reinforcement to meet forecasted demand.',
+      summary: 'Guwahati, Shillong, and Imphal require immediate resource reinforcement to meet forecasted demand.',
       areas: [
-        { area_id: 'A2', area_name: 'Ujjain', shortages: [{ resource: 'pumps', current: 2, required: 5, deficit: 3 }, { resource: 'medical_kits', current: 140, required: 200, deficit: 60 }] },
-        { area_id: 'A7', area_name: 'Mhow', shortages: [{ resource: 'pumps', current: 1, required: 3, deficit: 2 }] }
+        { area_id: 'GAU', area_name: 'Guwahati (Assam)', shortages: [{ resource: 'pumps', current: 15, required: 22, deficit: 7 }, { resource: 'medical_kits', current: 70, required: 95, deficit: 25 }] },
+        { area_id: 'SHL', area_name: 'Shillong (Meghalaya)', shortages: [{ resource: 'pumps', current: 9, required: 14, deficit: 5 }] }
       ]
     },
     transfers: [
-      { quantity: 2, resource: 'pumps', from_area: 'Ratlam', to_area: 'Ujjain', explanation: 'Reallocates surplus pumps from low-risk Ratlam to high-risk Ujjain.' },
-      { quantity: 1, resource: 'pumps', from_area: 'Dhar', to_area: 'Mhow', explanation: 'Optimizes short-haul equipment movement to prevent urban flooding.' }
+      { quantity: 3, resource: 'pumps', from_area: 'Itanagar (Arunachal Pradesh)', to_area: 'Guwahati (Assam)', explanation: 'Reallocates surplus pumps from lower-risk Itanagar to high-risk Guwahati.' },
+      { quantity: 2, resource: 'rescue_teams', from_area: 'Aizawl (Mizoram)', to_area: 'Imphal (Manipur)', explanation: 'Optimizes inter-state rescue team movement for valley inundation response.' }
     ]
   },
   modelStatus: {
     active_model: 'real_data_model',
     warning: null,
     models: {
-      real_data_model: { source_data: 'Live climate sensor network' }
+      real_data_model: { source_data: 'Open-Meteo Forecast API' }
     }
   }
 }
 
 async function request(path, options = {}) {
   const url = `${BASE_URL}${path}`
+  let response = null
   try {
-    const response = await fetch(url, {
+    response = await fetch(url, {
       headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
       ...options,
     })
@@ -155,13 +135,14 @@ async function request(path, options = {}) {
     return MOCK_DATA[key]
   }
 
-  throw new ApiError(`Request to ${path} failed and no fallback available`, { url })
+  throw new ApiError(`Request to ${path} failed`, { status: response?.status, url })
 }
 
 export const api = {
   health: () => request('/health'),
   areas: () => request('/areas'),
   risk: () => request('/risk'),
+  weather: (forceRefresh = false) => request('/weather' + (forceRefresh ? '?force_refresh=true' : '')),
   resources: () => request('/resources'),
   recommendations: () => request('/recommendations'),
   comparison: () => request('/comparison'),

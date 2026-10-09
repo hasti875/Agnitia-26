@@ -1,4 +1,4 @@
-export const FALLBACK_CENTER = [23.0, 75.9]
+export const FALLBACK_CENTER = [25.6, 92.5]
 
 export function isValidCoord(lat, lng) {
   return typeof lat === 'number' && Number.isFinite(lat)
@@ -12,7 +12,7 @@ function rowsOf(data, key) {
   return Array.isArray(rows) ? rows : []
 }
 
-export function joinMapData(areasData, riskData, resourcesData) {
+export function joinMapData(areasData, riskData, resourcesData, weatherData) {
   const riskById = new Map(rowsOf(riskData, 'areas').map((row) => [String(row.area_id), row]))
   const resourceRows = rowsOf(resourcesData, 'resources')
   const resourcesById = new Map()
@@ -22,9 +22,18 @@ export function joinMapData(areasData, riskData, resourcesData) {
     resourcesById.get(id).push(row)
   }
 
+  const weatherRows = rowsOf(weatherData, 'areas')
+  const weatherById = new Map()
+  for (const row of weatherRows) {
+    if (row.area_id) weatherById.set(String(row.area_id), row)
+    if (row.area_name) weatherById.set(String(row.area_name).toLowerCase(), row)
+  }
+
   const areas = rowsOf(areasData, 'areas').map((area) => {
     const id = String(area.area_id)
+    const nameKey = String(area.area_name || '').toLowerCase()
     const riskRow = riskById.get(id)
+    const weatherRow = weatherById.get(id) || weatherById.get(nameKey) || null
     const resourceList = resourcesById.get(id) || []
     const hasResourceData = resourceList.length > 0
     const deficits = {}
@@ -37,6 +46,7 @@ export function joinMapData(areasData, riskData, resourcesData) {
     const coordsValid = isValidCoord(lat, lng)
     const predictedRisk = riskRow && riskRow.predicted_risk !== null && riskRow.predicted_risk !== undefined && Number.isFinite(Number(riskRow.predicted_risk))
       ? Number(riskRow.predicted_risk) : null
+
     return {
       area_id: area.area_id,
       area_name: area.area_name,
@@ -49,6 +59,16 @@ export function joinMapData(areasData, riskData, resourcesData) {
       deficits,
       totalDeficit: hasResourceData ? Object.values(deficits).reduce((sum, value) => sum + value, 0) : 0,
       hasResourceData,
+      // Weather telemetry attributes
+      weather: weatherRow,
+      current_conditions: weatherRow?.current_conditions || null,
+      observed_metrics: weatherRow?.observed_metrics || null,
+      forecast_metrics: weatherRow?.forecast_metrics || null,
+      weather_status: weatherRow?.status || (weatherRow ? 'ok' : 'unavailable'),
+      is_stale: Boolean(weatherRow?.is_stale),
+      weather_source: weatherRow?.source || 'Open-Meteo Forecast API',
+      last_successful_fetch: weatherRow?.last_successful_fetch || null,
+      data_timestamp: weatherRow?.data_timestamp || null,
     }
   })
   return { areas: areas.filter((area) => area.coordsValid), excluded: areas.filter((area) => !area.coordsValid) }

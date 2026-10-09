@@ -9,9 +9,12 @@ import Comparison from './components/Comparison'
 import Explanations from './components/Explanations'
 import RiskMap from './components/RiskMap'
 
+const REFRESH_INTERVAL = 10 * 60 * 1000 // 10 minutes
+
 export default function App() {
   const areas = useApiData(api.areas)
-  const risk = useApiData(api.risk)
+  const risk = useApiData(api.risk, { refreshInterval: REFRESH_INTERVAL })
+  const weather = useApiData(api.weather, { refreshInterval: REFRESH_INTERVAL })
   const resources = useApiData(api.resources)
   const recommendations = useApiData(api.recommendations)
   const comparison = useApiData(api.comparison)
@@ -117,6 +120,7 @@ export default function App() {
                 setReloadAll((n) => n + 1)
                 areas.reload()
                 risk.reload()
+                weather.reload()
                 resources.reload()
                 recommendations.reload()
               }}
@@ -176,11 +180,12 @@ export default function App() {
         <RiskMap
           areas={areas.data}
           risk={risk.data}
+          weather={weather.data}
           resources={resources.data}
           recommendations={recommendations.data}
-          loading={overviewLoading}
-          error={overviewError}
-          onRetry={() => { areas.reload(); risk.reload(); resources.reload(); recommendations.reload() }}
+          loading={overviewLoading || weather.loading}
+          error={overviewError || weather.error}
+          onRetry={() => { areas.reload(); risk.reload(); weather.reload(); resources.reload(); recommendations.reload() }}
         />
 
         <ResourceAllocation

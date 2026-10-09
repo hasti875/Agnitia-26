@@ -23,12 +23,14 @@ import os
 import sys
 from typing import Dict, List, Optional, Tuple
 
-# Allow running as a plain script (in addition to `python -m uvicorn ...`).
-if __package__ in (None, ""):
-    sys.path.insert(
-        0,
-        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
-    )
+# Ensure project root and backend directories are always in sys.path
+_HERE = os.path.dirname(os.path.abspath(__file__))
+_BACKEND_DIR = os.path.dirname(_HERE)
+_PROJECT_ROOT = os.path.dirname(_BACKEND_DIR)
+
+for p in [_PROJECT_ROOT, _BACKEND_DIR]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 import csv
 
@@ -68,6 +70,7 @@ from backend.simulation.scenarios import (
 )
 from backend.analysis.comparison import compare_allocations
 from backend.utils.explanations import build_explanations
+from backend.forecasting.weather_service import get_all_weather, get_area_weather
 
 # Path to the static area CSV (read-only).
 _BACKEND_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -240,6 +243,20 @@ def model_status() -> dict:
 
 
 @app.get(
+    "/weather",
+    tags=["weather"],
+    summary="Live weather telemetry",
+    description=(
+        "Returns live current conditions, observed rolling precipitation totals (1h, 3h, 6h, 24h), "
+        "and hourly forecasts for representative locations via Open-Meteo API. "
+        "Includes data timestamps, fetch metadata, and stale/error indicators."
+    ),
+)
+def weather(force_refresh: bool = False) -> dict:
+    return get_all_weather(force_refresh=force_refresh)
+
+
+@app.get(
     "/areas",
     tags=["data"],
     summary="List all areas",
@@ -265,39 +282,62 @@ def get_areas() -> dict:
     return {"areas": out, "count": len(out)}
 
 
+from backend.risk.rule_based_calculator import calculate_rule_based_risk
+
 @app.get(
     "/risk",
     tags=["risk"],
     summary="Current predicted flood risk",
     description=(
-        "Returns the 6-hour-ahead predicted flood risk for all 8 areas using "
-        "the existing Phase 4 Random Forest model (no retraining). "
-        "Includes model provenance identifying which model generated the "
-        "predictions (synthetic baseline or real-data model)."
+        "Returns 6-hour-ahead rule-based flood risk index for all monitored areas "
+        "calculated dynamically from live Open-Meteo weather telemetry and static area vulnerability. "
+        "Includes methodology disclaimers and transparent step-by-step risk calculations."
     ),
 )
 def get_risk() -> dict:
-    risk = _predict_risk_by_area()
     areas = _area_static()
     out = []
     for area_id in sorted(areas.keys()):
-        info = risk.get(area_id, {"predicted_risk": 0.0, "area_name": areas[area_id]["area_name"]})
-        pr = _to_float(info["predicted_risk"])
+        a_info = areas[area_id]
+        vuln = _to_float(a_info.get("vulnerability_index", 0.5))
+
+        # Get live Open-Meteo weather for area
+        weather = get_area_weather(area_id)
+        obs = weather.get("observed_metrics") or {}
+        fc = weather.get("forecast_metrics") or {}
+
+        obs_rain = _to_float(obs.get("rainfall_last_24h", 0.0))
+        fc_rain = _to_float(fc.get("next_6h_precipitation_mm", 0.0))
+        prob = _to_float(fc.get("max_precip_probability_6h", 0.0))
+        soil = _to_float(obs.get("soil_moisture_0_to_1cm", 0.0))
+
+        risk_res = calculate_rule_based_risk(
+            observed_rain_24h_mm=obs_rain,
+            forecast_rain_6h_mm=fc_rain,
+            precip_probability_pct=prob,
+            soil_moisture=soil,
+            vulnerability_index=vuln,
+        )
+
         out.append({
             "area_id": area_id,
-            "area_name": info["area_name"],
-            "predicted_risk": pr,
-            "risk_level": classify_risk(pr),
+            "area_name": a_info["area_name"],
+            "predicted_risk": risk_res["predicted_risk"],
+            "risk_level": risk_res["risk_level"],
+            "methodology": risk_res["methodology"],
+            "explanation": risk_res["explanation"],
+            "components": risk_res["components"],
         })
+
     provenance = _model_provenance()
     return {
         "areas": out,
         "count": len(out),
+        "methodology_type": "Rule-Based Risk Engine (Open-Meteo Integration)",
+        "disclaimer": "Uncalibrated decision-support prototype. Not a verified flood probability.",
         "model_provenance": {
-            "active_model": provenance.get("active_model"),
-            "source_data": provenance.get("models", {})
-                .get(provenance.get("active_model", ""), {})
-                .get("source_data"),
+            "active_model": "rule_based_open_meteo_v1",
+            "source_data": "Open-Meteo Forecast API + areas.csv static parameters",
             "warning": provenance.get("warning"),
         },
     }
