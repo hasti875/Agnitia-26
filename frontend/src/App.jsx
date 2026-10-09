@@ -128,47 +128,47 @@ export default function App() {
         </div>
       </header>
 
-      {/* Hero Banner Section (Matching Reference Image 1!) */}
-      <section className="hero-banner">
-        <div className="hero-tag">
-          <span className="tag-badge tag-badge--orange">
-            ● Regional Average: <strong>74.5 AQI / Risk - High Alert</strong>
-          </span>
-        </div>
-
-        <h1 className="hero-title">
-          Smart Climate Risk Action for <span>Your Region</span>
-        </h1>
-
-        <p className="hero-subtitle">
-          Monitor flood risk in real-time, detect equipment shortages, earn efficiency arbitrage, and navigate resources through cleaner, optimal logistics routes.
-        </p>
-
-        <div className="hero-search-wrap">
-          <input
-            type="text"
-            placeholder="Enter Pincode (e.g. 452001) or Ward Name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <button type="button" className="hero-search-btn" onClick={() => scrollToSection('live-map')}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
-            Check Risk
-          </button>
-        </div>
-
-        <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
-          <button type="button" className="btn" onClick={() => scrollToSection('live-map')}>
-            View Live Map &rarr;
-          </button>
-          <button type="button" className="btn" onClick={() => scrollToSection('resources')}>
-            Inspect Emergency Logistics
-          </button>
-        </div>
-      </section>
-
       {/* Main Dashboard Cards */}
       <main className="app__main" key={reloadAll}>
+        {/* Hero Banner Section (Broad full-width inside main layout) */}
+        <section className="hero-banner">
+          <div className="hero-tag">
+            <span className="tag-badge tag-badge--orange">
+              ● Regional Average: <strong>74.5 AQI / Risk - High Alert</strong>
+            </span>
+          </div>
+
+          <h1 className="hero-title">
+            Smart Climate Risk Action for <span>Your Region</span>
+          </h1>
+
+          <p className="hero-subtitle">
+            Monitor flood risk in real-time, detect equipment shortages, earn efficiency arbitrage, and navigate resources through cleaner, optimal logistics routes.
+          </p>
+
+          <div className="hero-search-wrap">
+            <input
+              type="text"
+              placeholder="Enter Pincode (e.g. 452001) or Ward Name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <button type="button" className="hero-search-btn" onClick={() => scrollToSection('live-map')}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
+              Check Risk
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', gap: '12px', marginTop: '20px' }}>
+            <button type="button" className="btn" onClick={() => scrollToSection('live-map')}>
+              View Live Map &rarr;
+            </button>
+            <button type="button" className="btn" onClick={() => scrollToSection('resources')}>
+              Inspect Emergency Logistics
+            </button>
+          </div>
+        </section>
+
         <Overview
           areas={areas.data}
           risk={risk.data}
