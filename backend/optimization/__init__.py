@@ -1,0 +1,36 @@
+# optimization package — OR-Tools resource allocation (Phase 6)
+from .optimizer import (
+    RESOURCES,
+    DISTANCES_CSV,
+    RISK_WEIGHT,
+    DEFICIT_WEIGHT,
+    POPULATION_WEIGHT,
+    VULNERABILITY_WEIGHT,
+    RESOURCE_COST_WEIGHT,
+    AreaInfo,
+    Movement,
+    AreaFinalState,
+    OptimizationResult,
+    load_distances,
+    build_area_infos,
+    optimize_resource_allocation,
+    run_optimizer,
+)
+
+__all__ = [
+    "RESOURCES",
+    "DISTANCES_CSV",
+    "RISK_WEIGHT",
+    "DEFICIT_WEIGHT",
+    "POPULATION_WEIGHT",
+    "VULNERABILITY_WEIGHT",
+    "RESOURCE_COST_WEIGHT",
+    "AreaInfo",
+    "Movement",
+    "AreaFinalState",
+    "OptimizationResult",
+    "load_distances",
+    "build_area_infos",
+    "optimize_resource_allocation",
+    "run_optimizer",
+]

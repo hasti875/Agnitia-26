@@ -1,0 +1,59 @@
+{
+  "model_type": "RandomForestRegressor",
+  "framework": "scikit-learn",
+  "trained_at_utc": "2026-10-08T17:49:44+00:00",
+  "forecast_horizon_hours": 6,
+  "target_definition": "future_flood_risk = flood_risk at T + 6h (same area)",
+  "feature_names": [
+    "rainfall_last_1h",
+    "rainfall_last_3h",
+    "rainfall_last_6h",
+    "rainfall_trend",
+    "river_level",
+    "river_level_change",
+    "river_level_trend",
+    "temperature",
+    "humidity",
+    "historical_flood_frequency",
+    "population",
+    "population_density",
+    "vulnerability_index",
+    "road_accessibility"
+  ],
+  "hyperparameters": {
+    "n_estimators": 200,
+    "max_depth": 18,
+    "min_samples_leaf": 2,
+    "random_state": 42,
+    "n_jobs": -1
+  },
+  "split": {
+    "cutoff": "2024-10-25 05:00:00",
+    "train_start": "2024-06-01 03:00:00",
+    "train_end": "2024-10-25 04:00:00",
+    "test_start": "2024-10-25 05:00:00",
+    "test_end": "2024-11-30 17:00:00",
+    "n_train_rows": "28048",
+    "n_test_rows": "7016"
+  },
+  "n_rows_total": 35064,
+  "metrics": {
+    "mae": 2.9536,
+    "rmse": 3.7169,
+    "r2": 0.1016
+  },
+  "train_metrics": {
+    "mae": 2.1456,
+    "rmse": 2.8912,
+    "r2": 0.9237
+  },
+  "evaluation_context": {
+    "test_target_std": 3.9215,
+    "test_target_mean": 10.3441,
+    "baseline_mae_train_mean": 7.6687,
+    "label_noise_sigma": 3.5,
+    "note": "Test window is the dry season, so target variance is low and the 3.5-point synthetic label noise caps achievable R2 near 0.20. MAE below the noise sigma is near-optimal for this data."
+  },
+  "source_data": "backend/data/climate_history.csv (SYNTHETIC)",
+  "disclaimer": "Trained on fully synthetic data for a hackathon prototype. Predictions are for demonstration only and must not be used for real-world emergency decisions."
+}
