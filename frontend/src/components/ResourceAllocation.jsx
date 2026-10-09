@@ -1,8 +1,6 @@
-import { Section, DeficitTag, SurplusTag } from './ui'
+import { Section, RiskBadge, ProgressBar, ShortfallPill } from './ui'
 import { fmtInt } from '../format'
 
-// ResourceAllocation — current vs required inventory per area and resource,
-// with shortages highlighted. Units only (no currency/distance here).
 export function ResourceAllocation({ resources, loading, error, onRetry }) {
   const rows = resources?.resources ?? []
 
@@ -10,90 +8,94 @@ export function ResourceAllocation({ resources, loading, error, onRetry }) {
   const byArea = {}
   const order = []
   for (const r of rows) {
-    if (!byArea[r.area_id]) { byArea[r.area_id] = { name: r.area_name, rows: [] }; order.push(r.area_id) }
-    byArea[r.area_id].rows.push(r)
+    if (!byArea[r.area_id]) {
+      byArea[r.area_id] = {
+        name: r.area_name,
+        rows: {},
+        totalDeficit: 0,
+        totalSurplus: 0
+      }
+      order.push(r.area_id)
+    }
+    byArea[r.area_id].rows[r.resource] = r
+    byArea[r.area_id].totalDeficit += (r.deficit || 0)
+    byArea[r.area_id].totalSurplus += (r.surplus || 0)
   }
 
   // Resource columns present in the data.
   const resourceTypes = []
   for (const r of rows) if (!resourceTypes.includes(r.resource)) resourceTypes.push(r.resource)
 
-  const totalDeficitRows = rows.filter((r) => r.deficit > 0).length
-
   return (
     <Section
-      title="Resource allocation"
-      subtitle="Current inventory vs required inventory by area and resource type."
+      id="resources"
+      title="Resource coordination"
+      subtitle="EMERGENCY LOGISTICS · Regional inventory, live shortages, and automated fulfillment tracking."
       loading={loading}
       error={error}
       onRetry={onRetry}
       isEmpty={!loading && !error && rows.length === 0}
     >
-      <p className="muted" aria-live="polite">
-        {totalDeficitRows > 0
-          ? `${totalDeficitRows} area/resource combination(s) are in deficit (highlighted).`
-          : 'No deficits are currently calculated.'}
-      </p>
-
       <div className="table-wrap">
         <table className="table">
           <thead>
             <tr>
-              <th scope="col" rowSpan="2">Area</th>
+              <th scope="col" style={{ width: '18%' }}>Region</th>
+              <th scope="col" style={{ width: '15%' }}>Risk Category</th>
               {resourceTypes.map((res) => (
-                <th key={res} scope="colgroup" colSpan="4" className="th-group">
+                <th key={res} scope="col" style={{ width: '18%' }}>
                   {res.replace(/_/g, ' ')}
                 </th>
               ))}
-            </tr>
-            <tr>
-              {resourceTypes.map((res) => (
-                <FragmentSub key={res} />
-              ))}
+              <th scope="col" style={{ width: '14%', textAlign: 'right' }}>Shortfall Status</th>
             </tr>
           </thead>
           <tbody>
-            {order.map((aid) => (
-              <tr key={aid}>
-                <th scope="row" className="label">{byArea[aid].name}</th>
-                {resourceTypes.map((res) => {
-                  const cell = byArea[aid].rows.find((r) => r.resource === res)
-                  return (
-                    <ResourceCells key={res} cell={cell} />
-                  )
-                })}
-              </tr>
-            ))}
+            {order.map((aid) => {
+              const areaData = byArea[aid]
+              const totalDef = areaData.totalDeficit
+              const totalSur = areaData.totalSurplus
+
+              // Assign a representative risk category for demo
+              const demoRisk = totalDef > 50 ? 'CRITICAL' : totalDef > 0 ? 'HIGH' : 'LOW'
+
+              return (
+                <tr key={aid}>
+                  <td className="label" style={{ fontSize: '0.92rem' }}>
+                    {areaData.name}
+                  </td>
+                  <td>
+                    <RiskBadge level={demoRisk} />
+                  </td>
+                  {resourceTypes.map((res) => {
+                    const cell = areaData.rows[res]
+                    if (!cell) return <td key={res} className="muted">—</td>
+
+                    const isDef = cell.deficit > 0
+                    const status = isDef ? 'danger' : 'normal'
+                    return (
+                      <td key={res}>
+                        <ProgressBar
+                          current={cell.current}
+                          max={cell.required}
+                          status={status}
+                        />
+                      </td>
+                    )
+                  })}
+                  <td style={{ textAlign: 'right' }}>
+                    <ShortfallPill deficit={totalDef} surplus={totalSur} />
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>
       <p className="footnote muted">
-        All values are resource units. “Required” is the Phase 5 computed requirement; deficit = required − current (≥ 0); surplus = current − required (≥ 0).
+        Inventory units represent deployed vs. required field capacity. Automated deficits dictate Phase 6 OR-Tools optimizer movements.
       </p>
     </Section>
-  )
-}
-
-function FragmentSub() {
-  return (
-    <>
-      <th scope="col">Current</th>
-      <th scope="col">Required</th>
-      <th scope="col">Surplus</th>
-      <th scope="col">Deficit</th>
-    </>
-  )
-}
-
-function ResourceCells({ cell }) {
-  if (!cell) return <td className="muted" colSpan="4">—</td>
-  return (
-    <>
-      <td className="num">{fmtInt(cell.current)}</td>
-      <td className="num">{fmtInt(cell.required)}</td>
-      <td className="num"><SurplusTag value={cell.surplus} /></td>
-      <td className="num"><DeficitTag value={cell.deficit} /></td>
-    </>
   )
 }
 

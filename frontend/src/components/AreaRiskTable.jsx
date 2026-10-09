@@ -2,14 +2,10 @@ import { useState } from 'react'
 import { Section, RiskBadge } from './ui'
 import { fmtNum } from '../format'
 
-// AreaRiskTable — all eight areas with predicted risk, category and the extra
-// static details the API provides (population, density, vulnerability).
-// Columns are sortable (click a header) but the default order is by risk.
 export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
   const [sortKey, setSortKey] = useState('predicted_risk')
   const [sortDir, setSortDir] = useState('desc')
 
-  // Merge /risk with /areas static detail by area_id.
   const staticById = {}
   for (const a of areas?.areas ?? []) staticById[a.area_id] = a
 
@@ -25,12 +21,12 @@ export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
   })
 
   const headers = [
-    { key: 'area_name', label: 'Area' },
-    { key: 'predicted_risk', label: 'Predicted risk' },
+    { key: 'area_name', label: 'Area / Ward Name' },
+    { key: 'predicted_risk', label: '6h Predicted Risk' },
     { key: 'risk_level', label: 'Category' },
     { key: 'population', label: 'Population (000s)' },
     { key: 'population_density', label: 'Density (/km²)' },
-    { key: 'vulnerability_index', label: 'Vulnerability' },
+    { key: 'vulnerability_index', label: 'Vulnerability Index' },
   ]
 
   function toggleSort(key) {
@@ -40,8 +36,9 @@ export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
 
   return (
     <Section
-      title="Area risk"
-      subtitle="6-hour-ahead predicted flood risk per area (model forecast)."
+      id="area-risk"
+      title="Regional Risk & Demographics"
+      subtitle="6-hour-ahead predicted flood risk per area alongside demographic vulnerability metrics."
       loading={loading}
       error={error}
       onRetry={onRetry}
@@ -52,10 +49,25 @@ export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
           <thead>
             <tr>
               {headers.map((h) => (
-                <th key={h.key} scope="col" aria-sort={sortKey === h.key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'}>
-                  <button type="button" className="th-sort" onClick={() => toggleSort(h.key)}>
+                <th key={h.key} scope="col">
+                  <button
+                    type="button"
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      font: 'inherit',
+                      fontWeight: 'inherit',
+                      color: 'inherit',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                    onClick={() => toggleSort(h.key)}
+                  >
                     {h.label}
-                    <span className="th-sort__arrow" aria-hidden="true">
+                    <span style={{ fontSize: '0.7rem', opacity: 0.7 }}>
                       {sortKey === h.key ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
                     </span>
                   </button>
@@ -68,9 +80,11 @@ export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
               <tr key={r.area_id}>
                 <td className="label">
                   {r.area_name}
-                  <span className="muted mono"> ({r.area_id})</span>
+                  <span className="muted" style={{ fontSize: '0.8rem', marginLeft: '6px' }}>({r.area_id})</span>
                 </td>
-                <td className="num">{fmtNum(r.predicted_risk, 1)}<span className="muted"> /100</span></td>
+                <td className="num" style={{ fontWeight: 800 }}>
+                  {fmtNum(r.predicted_risk, 1)}<span className="muted">/100</span>
+                </td>
                 <td><RiskBadge level={r.risk_level} /></td>
                 <td className="num">{fmtNum(r.population, 0)}</td>
                 <td className="num">{fmtNum(r.population_density, 0)}</td>
@@ -80,9 +94,6 @@ export function AreaRiskTable({ risk, areas, loading, error, onRetry }) {
           </tbody>
         </table>
       </div>
-      <p className="footnote muted">
-        Risk is a model prediction on a 0–100 scale. Category is shown with a marker and text label, not color alone.
-      </p>
     </Section>
   )
 }
