@@ -8,11 +8,11 @@
   --panel-hover: #f8faf9;
   --border: #e2ece9;
   --border-subtle: #edf4f2;
-  
+
   --text: #0f172a;
   --text-secondary: #475569;
   --muted: #64748b;
-  
+
   /* Primary Brand Teal */
   --teal-primary: #0d9488;
   --teal-hover: #0f766e;
@@ -21,25 +21,25 @@
   --teal-light-hover: #ccfbf1;
   --teal-border: #99f6e4;
   --accent: #0d9488;
-  
+
   /* Risk & Status Colors (Matching Reference Images) */
   --ok: #10b981;
   --ok-bg: #ecfdf5;
   --ok-border: #a7f3d0;
-  
+
   --warn: #f59e0b;
   --warn-bg: #fef3c7;
   --warn-border: #fde68a;
-  
+
   --orange: #f97316;
   --orange-bg: #ffedd5;
-  
+
   --deficit: #ef4444;
   --deficit-bg: #fee2e2;
   --deficit-border: #fca5a5;
-  
+
   --surplus: #059669;
-  
+
   --low: #10b981;
   --low-bg: #e6f4f1;
   --moderate: #eab308;
@@ -97,7 +97,8 @@ body {
 }
 
 .app__header-inner {
-  max-width: 1320px;
+  max-width: 1680px;
+  width: 96%;
   margin: 0 auto;
   padding: 12px 24px;
   display: flex;
@@ -218,19 +219,31 @@ body {
 }
 
 @keyframes pulse-dot {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
-  70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+  }
+
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+  }
+
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+  }
 }
 
 /* ==========================================
    HERO BANNER (Reference Image 1)
    ========================================== */
 .hero-banner {
-  max-width: 1320px;
-  margin: 20px auto 0;
-  padding: 36px 32px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(240,253,250,0.85) 100%);
+  width: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 40px 48px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 253, 250, 0.85) 100%);
   border: 1px solid var(--border);
   border-radius: 24px;
   box-shadow: var(--shadow-md);
@@ -245,7 +258,7 @@ body {
   right: -50px;
   width: 320px;
   height: 320px;
-  background: radial-gradient(circle, rgba(13, 148, 136, 0.12) 0%, rgba(255,255,255,0) 70%);
+  background: radial-gradient(circle, rgba(13, 148, 136, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
   pointer-events: none;
 }
 
@@ -265,26 +278,27 @@ body {
 
 .hero-title {
   margin: 0 0 12px;
-  font-size: 2.5rem;
+  font-size: 2.75rem;
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.8px;
   color: #0f172a;
-  max-width: 720px;
+  max-width: 900px;
 }
 
 .hero-title span {
   color: var(--teal-primary);
   background: linear-gradient(135deg, var(--teal-primary), #0e8585);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .hero-subtitle {
   margin: 0 0 24px;
-  font-size: 1.05rem;
+  font-size: 1.08rem;
   color: var(--text-secondary);
-  max-width: 680px;
+  max-width: 850px;
   line-height: 1.6;
 }
 
@@ -292,7 +306,7 @@ body {
   display: flex;
   align-items: center;
   gap: 12px;
-  max-width: 580px;
+  max-width: 680px;
   background: #ffffff;
   padding: 6px 6px 6px 18px;
   border-radius: 999px;
@@ -340,10 +354,10 @@ body {
    ========================================== */
 .app__main {
   flex: 1;
-  width: 100%;
-  max-width: 1320px;
+  width: 96%;
+  max-width: 1680px;
   margin: 20px auto;
-  padding: 0 24px 40px;
+  padding: 0 12px 40px;
   display: grid;
   gap: 24px;
 }
@@ -495,13 +509,15 @@ body {
   font-weight: 700;
 }
 
-.tag-badge--ok, .tag-badge--green {
+.tag-badge--ok,
+.tag-badge--green {
   background: #ecfdf5;
   color: #047857;
   border: 1px solid #a7f3d0;
 }
 
-.tag-badge--warn, .tag-badge--yellow {
+.tag-badge--warn,
+.tag-badge--yellow {
   background: #fef3c7;
   color: #b45309;
   border: 1px solid #fde68a;
@@ -513,7 +529,8 @@ body {
   border: 1px solid #fed7aa;
 }
 
-.tag-badge--danger, .tag-badge--red {
+.tag-badge--danger,
+.tag-badge--red {
   background: #fee2e2;
   color: #b91c1c;
   border: 1px solid #fca5a5;
@@ -611,7 +628,7 @@ body {
   font-size: 0.75rem;
   padding: 2px 7px;
   border-radius: 999px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   white-space: nowrap;
 }
 
@@ -663,7 +680,8 @@ body {
   text-align: left;
 }
 
-.ward-card:hover, .ward-card.is-selected {
+.ward-card:hover,
+.ward-card.is-selected {
   border-color: var(--teal-primary);
   background: var(--teal-light);
   transform: translateX(2px);
@@ -933,7 +951,8 @@ body {
 }
 
 .app__footer p {
-  max-width: 1320px;
+  max-width: 1680px;
+  width: 96%;
   margin: 0 auto;
   color: var(--muted);
   font-size: 0.82rem;
@@ -941,12 +960,26 @@ body {
 }
 
 /* Utilities */
-.muted { color: var(--muted); }
-.footnote { font-size: 0.78rem; margin-top: 10px; }
+.muted {
+  color: var(--muted);
+}
+
+.footnote {
+  font-size: 0.78rem;
+  margin-top: 10px;
+}
 
 /* Responsive adjustments */
 @media (max-width: 900px) {
-  .risk-map__layout { grid-template-columns: 1fr; }
-  .hero-title { font-size: 1.85rem; }
-  .nav-links { display: none; }
+  .risk-map__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-title {
+    font-size: 1.85rem;
+  }
+
+  .nav-links {
+    display: none;
+  }
 }
