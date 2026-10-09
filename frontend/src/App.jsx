@@ -132,12 +132,6 @@ export default function App() {
       <main className="app__main" key={reloadAll}>
         {/* Hero Banner Section (Broad full-width inside main layout) */}
         <section className="hero-banner">
-          <div className="hero-tag">
-            <span className="tag-badge tag-badge--orange">
-              ● Regional Average: <strong>74.5 AQI / Risk - High Alert</strong>
-            </span>
-          </div>
-
           <h1 className="hero-title">
             Smart Climate Risk Action for <span>Your Region</span>
           </h1>
