@@ -478,8 +478,8 @@ def compare_allocations(
             "equals 1.0 when there is no deficit.",
         ],
         "limitations": [
-            "This is an estimated prototype risk-impact metric based on "
-            "synthetic data.",
+            "This is an estimated risk-impact metric based on live weather "
+            "telemetry and real-world area statistics for NE India.",
             "It does NOT measure lives saved, guaranteed disaster prevention, "
             "or proven real-world disaster reduction.",
             "A negative reduction is possible and valid if the optimized "

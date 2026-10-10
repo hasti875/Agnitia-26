@@ -84,15 +84,15 @@ RESOURCES: List[str] = ["pumps", "rescue_teams", "medical_kits"]
 # ---------------------------------------------------------------------------
 
 BASE_UNITS: Dict[str, float] = {
-    "pumps":         7.0,
-    "rescue_teams":  6.0,
-    "medical_kits": 38.0,
+    "pumps":         12.0,   # raised: NE India flood zones need more pumps at baseline
+    "rescue_teams":  10.0,   # raised: multi-state monsoon response requires larger teams
+    "medical_kits":  60.0,   # raised: higher baseline medical preparedness for remote areas
 }
 
 MAX_REQUIRED: Dict[str, int] = {
-    "pumps":         25,
-    "rescue_teams":  20,
-    "medical_kits": 120,
+    "pumps":         35,
+    "rescue_teams":  28,
+    "medical_kits": 160,
 }
 
 # Risk scaling: multiplier = RISK_FLOOR + RISK_GAIN * risk/100

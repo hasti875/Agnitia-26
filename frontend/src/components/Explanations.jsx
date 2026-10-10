@@ -70,6 +70,42 @@ export function Explanations({ explanations, loading, error, onRetry }) {
           </div>
         </div>
       )}
+
+      {/* Transfer recommendations with plain-language reasons */}
+      {Array.isArray(e?.transfers) && e.transfers.length > 0 && (
+        <div style={{ marginBottom: '24px' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 12px', color: '#0f172a' }}>Transfer Recommendation Rationales</h3>
+          <div className="cards">
+            {e.transfers.map((t, i) => {
+              const key = `transfer-${i}`
+              const title = `${t.quantity ?? ''} ${(t.resource ?? '').replace(/_/g,' ')} · ${t.from_area} → ${t.to_area}`
+              return (
+                <Card key={key} title={title} open={!!open[key]} onToggle={() => toggle(key)}>
+                  <p style={{ margin: '6px 0', lineHeight: 1.6, fontSize: '0.88rem' }}>{t.explanation}</p>
+                  {t.limitation && (
+                    <p style={{ color: '#92400e', fontSize: '0.78rem', margin: '4px 0 0' }}>⚠ {t.limitation}</p>
+                  )}
+                </Card>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Allocation comparison explanation */}
+      {e?.allocation_comparison && (
+        <div style={{ marginBottom: '24px' }}>
+          <h3 style={{ fontSize: '1rem', fontWeight: 800, margin: '0 0 10px', color: '#0f172a' }}>Fixed vs Optimized Allocation — Why It Matters</h3>
+          <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '12px', padding: '16px 20px' }}>
+            <p style={{ margin: 0, lineHeight: 1.7, fontSize: '0.9rem', color: '#064e3b' }}>
+              {e.allocation_comparison.explanation}
+            </p>
+            {e.allocation_comparison.limitation && (
+              <p style={{ color: '#92400e', fontSize: '0.8rem', margin: '8px 0 0' }}>⚠ {e.allocation_comparison.limitation}</p>
+            )}
+          </div>
+        </div>
+      )}
     </Section>
   )
 }

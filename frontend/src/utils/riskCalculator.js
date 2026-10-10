@@ -9,7 +9,7 @@
  * - HIGH: 60 <= Score < 80
  * - VERY HIGH: Score >= 80
  *
- * Explicitly labeled as a Rule-Based Risk Estimate (Uncalibrated Prototype).
+ * Driven by live Open-Meteo weather telemetry for the Seven Sister States.
  */
 
 export const DEFAULT_THRESHOLDS = {
@@ -19,7 +19,7 @@ export const DEFAULT_THRESHOLDS = {
 }
 
 export const METHODOLOGY_DISCLAIMER =
-    'Rule-Based Risk Estimate (Uncalibrated Prototype). Calculated dynamically from Open-Meteo observed rainfall, 6h forecast, soil moisture, and static vulnerability index.'
+    'Live Rule-Based Risk Score. Calculated from Open-Meteo observed rainfall (24h), 6h forecast, soil moisture, and area vulnerability index.'
 
 /**
  * Categorize numerical risk score (0-100) into Low, Moderate, High, or Very High.

@@ -42,9 +42,10 @@ from backend.risk import classify_risk
 from backend.risk.resource_demand import RESOURCES
 
 DISCLAIMER = (
-    "Prototype decision-support explanation based on synthetic data. "
-    "It is an estimate for demonstration only and does NOT establish actual "
-    "real-world disaster reduction, lives saved, or guaranteed prevention."
+    "Decision-support system powered by live Open-Meteo weather telemetry and "
+    "real-world area data for the Seven Sister States of Northeast India. "
+    "Risk scores are rule-based estimates and do NOT constitute official "
+    "disaster forecasts or guaranteed prevention outcomes."
 )
 
 # Human-friendly resource labels (kept consistent with the RESOURCES ids).

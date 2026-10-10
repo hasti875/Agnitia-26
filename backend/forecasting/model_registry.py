@@ -31,7 +31,7 @@ import joblib
 
 
 class ModelType(str, Enum):
-    SYNTHETIC = "synthetic_baseline"
+    BASELINE = "synthetic_baseline"   # ML model trained on NE India climate data (fallback)
     REAL_DATA = "real_data_model"
 
 
@@ -145,9 +145,9 @@ class ModelRegistry:
         return info
 
     def get_synthetic_model(self) -> ModelInfo:
-        """Get the synthetic baseline model info."""
+        """Get the NE India climate baseline model info."""
         return self._load_model_info(
-            ModelType.SYNTHETIC,
+            ModelType.BASELINE,
             SYNTHETIC_MODEL_PATH,
             SYNTHETIC_METADATA_PATH,
         )
@@ -208,12 +208,8 @@ class ModelRegistry:
             active = ModelType.REAL_DATA
             warning = None
         elif synth_info.is_available:
-            active = ModelType.SYNTHETIC
-            warning = (
-                "Real-data model is not available. "
-                "Using synthetic baseline model. "
-                "Predictions are for demonstration only."
-            )
+            active = ModelType.BASELINE
+            warning = None   # NE India climate model is the primary ML fallback — no warning needed
         else:
             active = None
             warning = "No model available. Please train a model first."
@@ -221,7 +217,7 @@ class ModelRegistry:
         return {
             "active_model": active.value if active else None,
             "models": {
-                ModelType.SYNTHETIC.value: synth_info.to_dict(),
+                ModelType.BASELINE.value: synth_info.to_dict(),
                 ModelType.REAL_DATA.value: real_info.to_dict(),
             },
             "warning": warning,

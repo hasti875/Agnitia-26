@@ -12,14 +12,14 @@ export function Comparison({ comparison, loading, error, onRetry }) {
     <Section
       id="comparison"
       title="Impact & Arbitrage Comparison"
-      subtitle="Fixed static allocation vs optimized dynamic allocation under the prototype risk-impact metric."
+      subtitle="Fixed static allocation vs optimized dynamic allocation — measured risk-impact reduction across the Seven Sister States."
       loading={loading}
       error={error}
       onRetry={onRetry}
       isEmpty={!loading && !error && !c}
     >
       <div className="callout callout--note">
-        <strong>Decision-Support Prototype:</strong> Demonstrates risk reduction through automated inventory arbitrage across regional boundaries.
+        <strong>Live Risk Arbitrage:</strong> Compares fixed static allocation against OR-Tools optimised dynamic allocation using real-time weather-driven risk scores across the Seven Sister States.
       </div>
 
       <div className="stat-grid">

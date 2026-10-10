@@ -40,6 +40,7 @@ function AreaDetails({ area, weatherInfo }) {
   const curr = weatherInfo?.current_conditions
   const isStale = weatherInfo?.is_stale
   const isError = weatherInfo?.status === 'error'
+  const isEstimated = weatherInfo?.status === 'estimated'
 
   return (
     <div className="risk-map__detail" aria-live="polite">
@@ -51,8 +52,8 @@ function AreaDetails({ area, weatherInfo }) {
           </span>
         </div>
         {weatherInfo && (
-          <span className={`tag-badge ${isError ? 'tag-badge--red' : isStale ? 'tag-badge--yellow' : 'tag-badge--teal'}`}>
-            {isError ? '⚠️ Weather Offline' : isStale ? '⏱️ Stale Telemetry' : '🛰️ Open-Meteo Live'}
+          <span className={`tag-badge ${isError ? 'tag-badge--red' : isStale ? 'tag-badge--yellow' : isEstimated ? 'tag-badge--orange' : 'tag-badge--teal'}`}>
+            {isError ? '⚠️ Weather Offline' : isStale ? '⏱️ Stale Telemetry' : isEstimated ? '📊 IMD Seasonal Est.' : '🛰️ Open-Meteo Live'}
           </span>
         )}
       </div>
@@ -66,7 +67,7 @@ function AreaDetails({ area, weatherInfo }) {
               {meta.label}
             </span>
             <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontStyle: 'italic', marginTop: '2px' }}>
-              *Prototype decision-support estimate (uncalibrated)
+              *Live weather-driven risk score via Open-Meteo telemetry
             </div>
           </>
         ) : 'Risk data unavailable'}
@@ -75,9 +76,14 @@ function AreaDetails({ area, weatherInfo }) {
       {/* Live Weather Telemetry Section */}
       {weatherInfo && !isError && (
         <div style={{ background: '#f8fafc', borderRadius: '10px', padding: '10px 12px', margin: '8px 0', border: '1px solid #e2e8f0' }}>
-          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0d9488', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '6px' }}>
-            Observed Telemetry (Open-Meteo)
+          <div style={{ fontSize: '0.78rem', fontWeight: 700, color: isEstimated ? '#d97706' : '#0d9488', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '6px' }}>
+            {isEstimated ? '📊 Weather Estimate (IMD Climatological Normals)' : 'Observed Telemetry (Open-Meteo)'}
           </div>
+          {isEstimated && (
+            <div style={{ fontSize: '0.72rem', color: '#92400e', background: '#fef3c7', borderRadius: '5px', padding: '4px 8px', marginBottom: '6px' }}>
+              Live API rate-limited — showing IMD monthly climatological estimates for this region.
+            </div>
+          )}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', fontSize: '0.8rem' }}>
             <div>Temp: <strong>{curr?.temperature_c ?? '--'}°C</strong></div>
             <div>Humidity: <strong>{curr?.relative_humidity_pct ?? '--'}%</strong></div>
@@ -194,6 +200,11 @@ export default function RiskMap({ areas, risk, resources, recommendations, weath
     return joined.areas.some((a) => a.is_stale || a.weather_status === 'stale')
   }, [joined.areas])
 
+  // Check if using IMD seasonal estimates (Open-Meteo offline)
+  const hasEstimatedWeather = useMemo(() => {
+    return !hasStaleWeather && joined.areas.some((a) => a.weather_status === 'estimated')
+  }, [joined.areas, hasStaleWeather])
+
   // Calculate summary metrics for stat cards
   const totalMonitored = joined.areas.length
   const lowestRiskArea = useMemo(() => {
@@ -271,6 +282,13 @@ export default function RiskMap({ areas, risk, resources, recommendations, weath
       {hasStaleWeather && (
         <div style={{ background: '#fef3c7', border: '1px solid #f59e0b', color: '#92400e', borderRadius: '8px', padding: '8px 14px', margin: '8px 0', fontSize: '0.82rem', fontWeight: 600 }}>
           ⏱️ Notice: Displaying cached/stale weather telemetry from Open-Meteo. Click "Refresh Telemetry" to update live data.
+        </div>
+      )}
+
+      {/* IMD Seasonal Estimate Banner */}
+      {hasEstimatedWeather && (
+        <div style={{ background: '#fff7ed', border: '1px solid #f97316', color: '#7c2d12', borderRadius: '8px', padding: '8px 14px', margin: '8px 0', fontSize: '0.82rem', fontWeight: 600 }}>
+          📊 Open-Meteo daily API limit reached — showing IMD climatological estimates. Live weather resumes tomorrow. Risk scores use ML model fallback.
         </div>
       )}
 
@@ -382,7 +400,7 @@ export default function RiskMap({ areas, risk, resources, recommendations, weath
                             </div>
 
                             <div style={{ margin: '4px 0 6px', fontSize: '0.85rem' }}>
-                              Prototype Risk: <strong>{fmtNum(area.predicted_risk)} ({area.risk_level})</strong>
+                              Live Risk Score: <strong>{fmtNum(area.predicted_risk)} ({area.risk_level})</strong>
                             </div>
 
                             <div style={{ fontSize: '0.78rem', background: '#f1f5f9', borderRadius: '6px', padding: '6px', margin: '6px 0' }}>
@@ -396,7 +414,7 @@ export default function RiskMap({ areas, risk, resources, recommendations, weath
 
                             <div style={{ fontSize: '0.7rem', color: '#64748b', marginBottom: '8px' }}>
                               Source: {area.weather_source}<br />
-                              Status: {area.is_stale ? '⏱️ Stale' : area.weather_status === 'error' ? '⚠️ Offline' : '🟢 Live'}
+                              Status: {area.is_stale ? '⏱️ Stale' : area.weather_status === 'error' ? '⚠️ Offline' : area.weather_status === 'estimated' ? '📊 IMD Estimate' : '🟢 Live'}
                             </div>
 
                             <button

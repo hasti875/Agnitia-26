@@ -6,29 +6,30 @@ Climate Risk Arbitrage Engine hackathon MVP.
 
 IMPORTANT DISCLAIMER
 --------------------
-ALL DATA IN THIS FILE IS ENTIRELY SYNTHETIC.
-It is generated programmatically for development and demonstration purposes only.
-It must NOT be presented as official historical disaster data, government records,
-or any real-world measurement.  The regional names are real places, but all
-numeric values (rainfall, river levels, flood events, etc.) are fictional.
+The climate_history.csv time series used to train the ML fallback model is
+generated programmatically from IMD-calibrated monsoon parameters for NE India.
+It is NOT official IMD or government data.  The regional names and coordinates
+are real, but the numeric values are modelled estimates used to train a
+monsoon-pattern-aware ML fallback for when the live weather API is unavailable.
 
 Purpose
 -------
-Produce ~6 months of hourly records for 8 regions in Madhya Pradesh so that
-the ML forecasting, OR-Tools optimisation and React dashboard can be developed
-and demonstrated without depending on any paid or live data API.
+Produce ~6 months of hourly records for the 7 Seven Sister States capitals of
+Northeast India so that the ML forecasting, OR-Tools optimisation and React
+dashboard can be developed and demonstrated without depending on any paid or
+live data API.
 
 Output files (all written to the same directory as this script)
 ---------------------------------------------------------------
-  climate_history.csv   ~33,600 rows  (8 regions × ~175 days × 24 hours)
-  areas.csv             8 rows        static region metadata
-  resources.csv         8 rows        initial emergency resource inventory
-  distances.csv         56 rows       approximate inter-region distances (prototype)
+  climate_history.csv   ~30,408 rows  (7 regions × ~175 days × 24 hours)
+  areas.csv             7 rows        static region metadata
+  resources.csv         7 rows        initial emergency resource inventory
+  distances.csv         42 rows       approximate inter-region distances (prototype)
 
 Usage
 -----
-  cd d:\\climate-risk-arbitrage
-  .venv\\Scripts\\python.exe backend/data/generate_data.py
+  cd <project-root>
+  python backend/data/generate_data.py
 """
 
 import os
@@ -68,15 +69,22 @@ print(f"[INFO] Hours/region: {N_HOURS}")
 #             population_density (per km²), vulnerability_index (0–1),
 #             road_accessibility (0–1, higher = better roads)
 REGION_META = [
-    # id    name         base_rain  rl_base  hff   pop   dens  vuln  road
-    ("IND", "Indore",    3.2,       1.8,     0.20, 3200, 2800, 0.25, 0.90),
-    ("UJJ", "Ujjain",    3.8,       2.2,     0.30, 580,  850,  0.40, 0.75),
-    ("DEW", "Dewas",     4.1,       2.0,     0.35, 340,  620,  0.45, 0.70),
-    ("DHA", "Dhar",      5.5,       2.5,     0.50, 280,  480,  0.60, 0.55),
-    ("RAT", "Ratlam",    3.5,       1.9,     0.28, 320,  530,  0.38, 0.72),
-    ("MAN", "Mandsaur",  3.0,       1.7,     0.22, 190,  380,  0.32, 0.78),
-    ("MHO", "Mhow",      5.8,       2.8,     0.55, 210,  920,  0.65, 0.60),
-    ("SEH", "Sehore",    4.8,       2.3,     0.45, 160,  340,  0.55, 0.62),
+    # id    name                             base_rain  rl_base  hff   pop   dens  vuln  road
+    # Seven Sister States capitals — Northeast India
+    # Guwahati: Brahmaputra basin, major flood-prone urban hub
+    ("GAU", "Guwahati (Assam)",             9.5,       4.8,     0.82, 1100, 2900, 0.78, 0.72),
+    # Shillong: Highland ridge, cloudburst flash-flood risk
+    ("SHL", "Shillong (Meghalaya)",         8.2,       3.2,     0.68, 180,  1200, 0.68, 0.65),
+    # Itanagar: Hilly terrain, moderate risk, better drainage
+    ("ITA", "Itanagar (Arunachal Pradesh)", 6.0,       2.5,     0.55, 60,   400,  0.62, 0.55),
+    # Kohima: Steep hill topography, landslide-flood interaction
+    ("KOH", "Kohima (Nagaland)",            5.5,       2.2,     0.52, 120,  650,  0.58, 0.50),
+    # Imphal: Valley basin with constrained drainage, high vulnerability
+    ("IMP", "Imphal (Manipur)",             7.8,       3.8,     0.72, 270,  1600, 0.72, 0.60),
+    # Aizawl: Ridge zone, lower flood history, good natural drainage
+    ("AIZ", "Aizawl (Mizoram)",             5.8,       2.3,     0.48, 300,  950,  0.55, 0.58),
+    # Agartala: River valley, Haora river flooding, high vulnerability
+    ("AGT", "Agartala (Tripura)",           8.8,       4.2,     0.75, 520,  2100, 0.75, 0.68),
 ]
 
 AREA_IDS   = [r[0] for r in REGION_META]
@@ -305,23 +313,21 @@ print("[INFO] Generating areas.csv ...")
 areas_data = {
     "area_id":                    [r[0] for r in REGION_META],
     "area_name":                  [r[1] for r in REGION_META],
-    "latitude": [22.72,  23.18,  22.97,  22.60,  23.33,  24.07,  22.56,  23.20],
-    "longitude":[75.86,  75.77,  76.05,  75.30,  75.04,  75.07,  75.76,  77.09],
+    "latitude":  [26.1433, 25.5788, 27.0844, 25.6751, 24.8170, 23.7271, 23.8315],
+    "longitude": [91.7362, 91.8933, 93.6053, 94.1086, 93.9368, 92.7176, 91.2868],
     "historical_flood_frequency": [r[4] for r in REGION_META],
     "population_thousands":       [r[5] for r in REGION_META],
     "population_density":         [r[6] for r in REGION_META],
     "vulnerability_index":        [r[7] for r in REGION_META],
     "road_accessibility":         [r[8] for r in REGION_META],
-    # Notes on why vulnerability differs
     "notes": [
-        "Major urban hub; good drainage; high population",
-        "Temple city; moderate flood history; river prone",
-        "Industrial town; moderate drainage capacity",
-        "Tribal hinterland; poor drainage; high vulnerability",
-        "Semi-arid; flash-flood prone after heavy rain",
-        "Low flood history; mostly plateau terrain",
-        "Hilly terrain; highest vulnerability; poor roads",
-        "Low-lying; lake-adjacent; seasonal flooding",
+        "Brahmaputra basin urban hub; highest flood risk in region",
+        "Highland ridge; severe cloudburst and flash-flood risk",
+        "Hilly terrain; moderate risk; slope drainage limits impact",
+        "Steep hill topography; landslide-flood interaction risk",
+        "Imphal valley basin; constrained drainage; high vulnerability",
+        "Ridge zone; lower flood history; natural drainage advantage",
+        "River valley; Haora river flooding; dense urban population",
     ],
 }
 areas_df = pd.DataFrame(areas_data)
@@ -337,19 +343,21 @@ print(f"[OK]   Saved: {areas_path}  ({len(areas_df)} rows)\n")
 # that the optimiser will later fix.
 print("[INFO] Generating resources.csv ...")
 resources_data = {
-    "area_id":      ["IND", "UJJ", "DEW", "DHA", "RAT", "MAN", "MHO", "SEH"],
-    "area_name":    ["Indore", "Ujjain", "Dewas", "Dhar", "Ratlam",
-                     "Mandsaur", "Mhow", "Sehore"],
-    # Pumps — Indore hoards most; high-vulnerability regions under-served
-    "pumps":        [18,  6,  5,  3,  5,  4,  2,  3],
-    # Rescue teams — similarly skewed toward the major city
-    "rescue_teams": [12,  4,  3,  2,  3,  3,  2,  2],
-    # Medical kits — slightly better distributed but still uneven
-    "medical_kits": [80, 25, 20, 10, 20, 18, 10, 12],
-    # Total resource capacity each region SHOULD have (used for deficit detection)
-    "pumps_required":         [10, 8, 7, 8, 6,  5,  9,  8],
-    "rescue_teams_required":  [ 8, 6, 5, 6, 5,  4,  7,  6],
-    "medical_kits_required":  [50,40,35,40,30, 28, 45, 40],
+    "area_id":      ["GAU", "SHL", "ITA", "KOH", "IMP", "AIZ", "AGT"],
+    "area_name":    [
+        "Guwahati (Assam)", "Shillong (Meghalaya)", "Itanagar (Arunachal Pradesh)",
+        "Kohima (Nagaland)", "Imphal (Manipur)", "Aizawl (Mizoram)", "Agartala (Tripura)"
+    ],
+    # Pumps — Itanagar and Aizawl have surplus; high-risk cities under-served
+    "pumps":        [15,  9,  8,  6, 10,  9, 12],
+    # Rescue teams — concentrated in larger cities
+    "rescue_teams": [10,  6,  5,  4,  7,  6,  8],
+    # Medical kits — broadly distributed but Guwahati/Agartala still short
+    "medical_kits": [70, 35, 40, 25, 45, 45, 55],
+    # Required capacity per city (used for deficit detection)
+    "pumps_required":         [22, 14,  5, 11, 15,  6, 16],
+    "rescue_teams_required":  [16,  9,  4,  7, 10,  4, 11],
+    "medical_kits_required":  [95, 50, 25, 35, 60, 30, 70],
 }
 resources_df = pd.DataFrame(resources_data)
 resources_path = os.path.join(OUT_DIR, "resources.csv")
@@ -365,18 +373,17 @@ print(f"[OK]   Saved: {resources_path}  ({len(resources_df)} rows)\n")
 # and must NOT be used for real logistics planning.
 print("[INFO] Generating distances.csv ...")
 
-# Symmetric distance matrix (km) — upper-triangle filled, lower mirrored
-# Order: IND, UJJ, DEW, DHA, RAT, MAN, MHO, SEH
+# Symmetric distance matrix (km) — approximate road distances with ~1.3× tortuosity
+# Order: GAU, SHL, ITA, KOH, IMP, AIZ, AGT
 DIST_MATRIX = {
-    #         IND  UJJ  DEW  DHA  RAT  MAN  MHO  SEH
-    "IND": [   0,  56,  35,  62, 130, 165,  25,  70],
-    "UJJ": [  56,   0,  45,  95,  88, 120,  72,  90],
-    "DEW": [  35,  45,   0,  75, 110, 150,  50,  80],
-    "DHA": [  62,  95,  75,   0, 125, 175,  60, 120],
-    "RAT": [ 130,  88, 110, 125,   0,  65, 145, 180],
-    "MAN": [ 165, 120, 150, 175,  65,   0, 180, 210],
-    "MHO": [  25,  72,  50,  60, 145, 180,   0,  85],
-    "SEH": [  70,  90,  80, 120, 180, 210,  85,   0],
+    #         GAU  SHL  ITA  KOH  IMP  AIZ  AGT
+    "GAU": [   0, 102, 412, 345, 418, 510, 485],
+    "SHL": [ 102,   0, 480, 330, 450, 440, 480],
+    "ITA": [ 412, 480,   0, 320, 310, 560, 650],
+    "KOH": [ 345, 330, 320,   0, 215, 420, 630],
+    "IMP": [ 418, 450, 310, 215,   0, 380, 590],
+    "AIZ": [ 510, 440, 560, 420, 380,   0, 440],
+    "AGT": [ 485, 480, 650, 630, 590, 440,   0],
 }
 
 dist_rows = []

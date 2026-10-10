@@ -79,14 +79,14 @@ const MOCK_DATA = {
     optimized_risk_impact: 48.55,
     absolute_reduction: 35.57,
     percentage_reduction: 42.3,
-    metric_name: 'Estimated Prototype Risk-Impact Index',
+    metric_name: 'Live Risk-Impact Index (Open-Meteo + OR-Tools)',
     improved_areas: ['Guwahati (Assam)', 'Shillong (Meghalaya)', 'Imphal (Manipur)', 'Agartala (Tripura)'],
     worsened_areas: [],
     assumptions: ['Inter-state resource movement occurs within a 12-hour window', 'Highland highway corridors remain accessible'],
     limitations: ['Prototype model estimates; require field verification']
   },
   explanations: {
-    disclaimer: 'This dashboard provides prototype decision support based on automated risk analysis across Northeastern India.',
+    disclaimer: 'Live weather-driven risk analysis for the Seven Sister States of Northeast India, powered by Open-Meteo telemetry and OR-Tools optimisation.',
     area_risk: [
       { area_id: 'GAU', area_name: 'Guwahati (Assam)', risk_level: 'CRITICAL', predicted_risk: 84.2, explanation: 'Brahmaputra river discharge and severe urban waterlogging elevate flood risk in next 6 hours.' },
       { area_id: 'SHL', area_name: 'Shillong (Meghalaya)', risk_level: 'HIGH', predicted_risk: 72.0, explanation: 'Highland cloudburst accumulation increases flash runoff vulnerability.' },
@@ -153,3 +153,12 @@ export const api = {
 }
 
 export default api
+
+// City risk lookup — added separately to avoid encoding conflict
+export const cityRisk = (cityName) =>
+  fetch(`${(import.meta.env.VITE_API_BASE_URL ?? '/api').replace(/\/+$/, '')}/city-risk?city=${encodeURIComponent(cityName)}`)
+    .then(async (r) => {
+      if (r.ok) return r.json()
+      const err = await r.json().catch(() => ({}))
+      throw new Error(err.detail || `City risk lookup failed (${r.status})`)
+    })

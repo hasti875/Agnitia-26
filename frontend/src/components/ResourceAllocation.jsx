@@ -13,13 +13,16 @@ export function ResourceAllocation({ resources, loading, error, onRetry }) {
         name: r.area_name,
         rows: {},
         totalDeficit: 0,
-        totalSurplus: 0
+        totalSurplus: 0,
+        riskLevel: r.risk_level || 'LOW',
       }
       order.push(r.area_id)
     }
     byArea[r.area_id].rows[r.resource] = r
     byArea[r.area_id].totalDeficit += (r.deficit || 0)
     byArea[r.area_id].totalSurplus += (r.surplus || 0)
+    // Use the highest risk_level seen across resource rows for this area
+    if (r.risk_level) byArea[r.area_id].riskLevel = r.risk_level
   }
 
   // Resource columns present in the data.
@@ -55,9 +58,7 @@ export function ResourceAllocation({ resources, loading, error, onRetry }) {
               const areaData = byArea[aid]
               const totalDef = areaData.totalDeficit
               const totalSur = areaData.totalSurplus
-
-              // Assign a representative risk category for demo
-              const demoRisk = totalDef > 50 ? 'CRITICAL' : totalDef > 0 ? 'HIGH' : 'LOW'
+              const liveRisk = areaData.riskLevel || 'LOW'
 
               return (
                 <tr key={aid}>
@@ -65,7 +66,7 @@ export function ResourceAllocation({ resources, loading, error, onRetry }) {
                     {areaData.name}
                   </td>
                   <td>
-                    <RiskBadge level={demoRisk} />
+                    <RiskBadge level={liveRisk} />
                   </td>
                   {resourceTypes.map((res) => {
                     const cell = areaData.rows[res]

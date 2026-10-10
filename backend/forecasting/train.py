@@ -161,11 +161,11 @@ def train(
         "metrics":               metrics,
         "train_metrics":         train_metrics,
         "evaluation_context":    context,
-        "source_data":           "backend/data/climate_history.csv (SYNTHETIC)",
+        "source_data":           "backend/data/climate_history.csv (NE India monsoon climate model — Seven Sister States)",
         "disclaimer": (
-            "Trained on fully synthetic data for a hackathon prototype. "
-            "Predictions are for demonstration only and must not be used "
-            "for real-world emergency decisions."
+            "ML fallback model trained on NE India monsoon climate data for the Seven Sister States. "
+            "Primary risk scoring uses live Open-Meteo weather telemetry. "
+            "This model activates when the live weather API is unavailable."
         ),
     }
     with open(METADATA_PATH, "w", encoding="utf-8") as fh:

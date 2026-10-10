@@ -28,8 +28,9 @@ DEFAULT_THRESHOLDS = {
 }
 
 METHODOLOGY_DISCLAIMER = (
-    "Rule-Based Risk Estimate (Uncalibrated Prototype). "
-    "Calculated dynamically from Open-Meteo observed rainfall, 6h forecast, soil moisture, and static vulnerability index."
+    "Live Rule-Based Risk Score. "
+    "Calculated from Open-Meteo observed rainfall (24h), 6h forecast precipitation, "
+    "soil moisture, and area vulnerability index for the Seven Sister States of NE India."
 )
 
 

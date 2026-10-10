@@ -8,6 +8,8 @@ import Recommendations from './components/Recommendations'
 import Comparison from './components/Comparison'
 import Explanations from './components/Explanations'
 import RiskMap from './components/RiskMap'
+import Simulation from './components/Simulation'
+import CitySearch from './components/CitySearch'
 
 const REFRESH_INTERVAL = 10 * 60 * 1000 // 10 minutes
 
@@ -101,6 +103,26 @@ export default function App() {
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
                   Optimizer
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link ${activeTab === 'simulate' ? 'is-active' : ''}`}
+                  onClick={() => scrollToSection('simulate')}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                  What-If
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className={`nav-link ${activeTab === 'city-search' ? 'is-active' : ''}`}
+                  onClick={() => scrollToSection('city-search')}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                  City Lookup
                 </button>
               </li>
             </ul>
@@ -202,6 +224,10 @@ export default function App() {
           onRetry={recommendations.reload}
         />
 
+        <Simulation />
+
+        <CitySearch />
+
         <AreaRiskTable
           risk={risk.data}
           areas={areas.data}
@@ -228,7 +254,7 @@ export default function App() {
       {/* Footer */}
       <footer className="app__footer">
         <p>
-          Climate Risk Arbitrage Engine &middot; Decision support prototype estimates based on regional sensor telemetry and OR-Tools optimization.
+          Climate Risk Arbitrage Engine &middot; Live weather-driven risk forecasting and OR-Tools optimisation for the Seven Sister States of Northeast India.
         </p>
       </footer>
     </div>
